@@ -24,3 +24,10 @@ The trade-off: this library does not probe the running OS. You tell it the platf
 ## Edge you will hit
 
 Windows' keepalive struct uses 32-bit unsigned millisecond fields. An `idle` value that is perfectly reasonable in seconds can overflow once multiplied by 1000. The library caps at `0xFFFFFFFF` rather than letting the value wrap silently. If you pass something absurd like five million seconds, you will get the cap, not an error. Also, fractional seconds are truncated toward zero on every platform, not rounded.
+
+## Design notes
+
+The window stores values eagerly rather than keeping running aggregates. Running
+sums drift with floating point over long streams, and recomputing from a small
+buffer is cheap enough that the drift is not worth the speed.
+
